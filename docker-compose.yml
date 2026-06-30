@@ -52,7 +52,7 @@ services:
   qisur-service:
     image: golang:alpine
     working_dir: /app
-    command: sh -c "./bin/qisur-api"
+    command: sh -c "go build -o bin/qisur-api cmd/api/main.go && ./bin/qisur-api"
     volumes:
       - ./:/app
     container_name: qisur-api
@@ -74,7 +74,7 @@ services:
   qisur-tracker:
     image: golang:alpine
     working_dir: /app
-    command: sh -c "./bin/qisur-tracker"
+    command: sh -c "go build -o bin/qisur-tracker cmd/tracker/main.go && ./bin/qisur-tracker"
     volumes:
       - ./:/app
     container_name: qisur-tracker
