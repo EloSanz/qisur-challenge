@@ -92,7 +92,11 @@ export default function App() {
   const fetchRecentTraces = async () => {
     try {
       const res = await axios.get(`${API_URL}/traces`);
-      setRecentTraces(res.data || []);
+      if (Array.isArray(res.data)) {
+        setRecentTraces(res.data);
+      } else {
+        console.error('API returned non-array data:', res.data);
+      }
     } catch (err) {
       console.error('Error fetching traces:', err);
     }
@@ -102,7 +106,11 @@ export default function App() {
     setSelectedTraceId(traceId);
     try {
       const res = await axios.get(`${API_URL}/traces/${traceId}`);
-      const history: AuditTrace[] = res.data || [];
+      if (!Array.isArray(res.data)) {
+        console.error('API returned non-array data for trace details:', res.data);
+        return;
+      }
+      const history: AuditTrace[] = res.data;
 
       const newNodes = history.map((trace, index) => {
         const config = getActionConfig(trace.action);

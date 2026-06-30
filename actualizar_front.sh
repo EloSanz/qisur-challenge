@@ -6,6 +6,7 @@ git pull
 
 echo "Reconstruyendo backend..."
 docker compose up -d --build
+docker compose restart qisur-gateway
 
 echo "Construyendo frontend estático..."
 cd tracker-ui
