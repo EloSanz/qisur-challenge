@@ -24,8 +24,8 @@ func GetSecretKey() []byte {
 
 // Login credentials for Swagger documentation
 type Login struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required" example:"admin"`
+	Password string `json:"password" binding:"required" example:"admin"`
 }
 
 // DummyLogin is a dummy function to generate Swagger docs for the gin-jwt LoginHandler

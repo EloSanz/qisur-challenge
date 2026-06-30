@@ -3,8 +3,10 @@ definitions:
   internal_auth.Login:
     properties:
       password:
+        example: admin
         type: string
       username:
+        example: admin
         type: string
     required:
     - password
