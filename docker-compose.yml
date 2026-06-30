@@ -95,14 +95,14 @@ services:
         condition: service_healthy
 
   # Tracker UI (React)
-  tracker-ui:
-    image: node:20-alpine
-    working_dir: /app
-    command: sh -c "npm install && npm run dev -- --host"
-    volumes:
-      - ./tracker-ui:/app
-      - /app/node_modules
-    container_name: tracker-ui
+  # tracker-ui:
+  #   image: node:20-alpine
+  #   working_dir: /app
+  #   command: sh -c "npm install && npm run dev -- --host"
+  #   volumes:
+  #     - ./tracker-ui:/app
+  #     - /app/node_modules
+  #   container_name: tracker-ui
 
   # Log Database (Loki)
   loki:
