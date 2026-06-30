@@ -26,8 +26,7 @@ import (
 // @contact.url http://www.qisur.com.ar
 // @contact.email support@qisur.com.ar
 
-// @host localhost:8086
-// @BasePath /
+// @BasePath /qisur
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
@@ -37,9 +36,7 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-
 	_ = godotenv.Load()
-
 
 	db, err := database.InitDB()
 	if err != nil {
@@ -71,7 +68,6 @@ func main() {
 		Handler: router,
 	}
 
-
 	go func() {
 		slog.Info("Starting Qisur Service", "port", port)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -79,7 +75,6 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)

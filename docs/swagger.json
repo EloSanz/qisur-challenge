@@ -11,8 +11,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8086",
-    "basePath": "/",
+    "basePath": "/qisur",
     "paths": {
         "/api/auth/login": {
             "post": {
@@ -34,7 +33,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.Login"
+                            "$ref": "#/definitions/internal_auth.Login"
                         }
                     }
                 ],
@@ -84,14 +83,14 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/category.Category"
+                                "$ref": "#/definitions/internal_category.Category"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -120,7 +119,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/category.CreateCategoryRequest"
+                            "$ref": "#/definitions/internal_category.CreateCategoryRequest"
                         }
                     }
                 ],
@@ -128,19 +127,19 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/category.Category"
+                            "$ref": "#/definitions/internal_category.Category"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -178,7 +177,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/category.UpdateCategoryRequest"
+                            "$ref": "#/definitions/internal_category.UpdateCategoryRequest"
                         }
                     }
                 ],
@@ -186,25 +185,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/category.Category"
+                            "$ref": "#/definitions/internal_category.Category"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -236,19 +235,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -290,19 +289,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.PaginatedResponse"
+                            "$ref": "#/definitions/qisur-service_pkg_web.PaginatedResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -331,7 +330,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/product.CreateProductRequest"
+                            "$ref": "#/definitions/internal_product.CreateProductRequest"
                         }
                     }
                 ],
@@ -339,19 +338,19 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/product.Product"
+                            "$ref": "#/definitions/internal_product.Product"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -388,19 +387,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/product.Product"
+                            "$ref": "#/definitions/internal_product.Product"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -436,7 +435,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/product.UpdateProductRequest"
+                            "$ref": "#/definitions/internal_product.UpdateProductRequest"
                         }
                     }
                 ],
@@ -444,25 +443,25 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/product.Product"
+                            "$ref": "#/definitions/internal_product.Product"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -497,19 +496,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -560,14 +559,14 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/product.ProductHistory"
+                                "$ref": "#/definitions/internal_product.ProductHistory"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -606,20 +605,20 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/product.Product"
+                                "$ref": "#/definitions/qisur-service_internal_product.Product"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/web.Response"
+                            "$ref": "#/definitions/qisur-service_pkg_web.Response"
                         }
                     }
                 }
@@ -627,7 +626,7 @@
         }
     },
     "definitions": {
-        "auth.Login": {
+        "internal_auth.Login": {
             "type": "object",
             "required": [
                 "password",
@@ -642,7 +641,7 @@
                 }
             }
         },
-        "category.Category": {
+        "internal_category.Category": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -662,7 +661,7 @@
                 }
             }
         },
-        "category.CreateCategoryRequest": {
+        "internal_category.CreateCategoryRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -676,7 +675,7 @@
                 }
             }
         },
-        "category.UpdateCategoryRequest": {
+        "internal_category.UpdateCategoryRequest": {
             "type": "object",
             "properties": {
                 "description": {
@@ -687,7 +686,7 @@
                 }
             }
         },
-        "product.CreateProductRequest": {
+        "internal_product.CreateProductRequest": {
             "type": "object",
             "required": [
                 "name",
@@ -715,13 +714,13 @@
                 }
             }
         },
-        "product.Product": {
+        "internal_product.Product": {
             "type": "object",
             "properties": {
                 "categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/category.Category"
+                        "$ref": "#/definitions/qisur-service_internal_category.Category"
                     }
                 },
                 "created_at": {
@@ -747,7 +746,7 @@
                 }
             }
         },
-        "product.ProductHistory": {
+        "internal_product.ProductHistory": {
             "type": "object",
             "properties": {
                 "changed_at": {
@@ -767,7 +766,7 @@
                 }
             }
         },
-        "product.UpdateProductRequest": {
+        "internal_product.UpdateProductRequest": {
             "type": "object",
             "properties": {
                 "category_ids": {
@@ -791,7 +790,59 @@
                 }
             }
         },
-        "web.PaginatedResponse": {
+        "qisur-service_internal_category.Category": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "qisur-service_internal_product.Product": {
+            "type": "object",
+            "properties": {
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/qisur-service_internal_category.Category"
+                    }
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "qisur-service_pkg_web.PaginatedResponse": {
             "type": "object",
             "properties": {
                 "items": {},
@@ -806,7 +857,7 @@
                 }
             }
         },
-        "web.Response": {
+        "qisur-service_pkg_web.Response": {
             "type": "object",
             "properties": {
                 "data": {},

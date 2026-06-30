@@ -1,6 +1,6 @@
-basePath: /
+basePath: /qisur
 definitions:
-  auth.Login:
+  internal_auth.Login:
     properties:
       password:
         type: string
@@ -10,7 +10,7 @@ definitions:
     - password
     - username
     type: object
-  category.Category:
+  internal_category.Category:
     properties:
       created_at:
         type: string
@@ -23,7 +23,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  category.CreateCategoryRequest:
+  internal_category.CreateCategoryRequest:
     properties:
       description:
         type: string
@@ -32,14 +32,14 @@ definitions:
     required:
     - name
     type: object
-  category.UpdateCategoryRequest:
+  internal_category.UpdateCategoryRequest:
     properties:
       description:
         type: string
       name:
         type: string
     type: object
-  product.CreateProductRequest:
+  internal_product.CreateProductRequest:
     properties:
       category_ids:
         items:
@@ -58,11 +58,11 @@ definitions:
     - name
     - price
     type: object
-  product.Product:
+  internal_product.Product:
     properties:
       categories:
         items:
-          $ref: '#/definitions/category.Category'
+          $ref: '#/definitions/qisur-service_internal_category.Category'
         type: array
       created_at:
         type: string
@@ -79,7 +79,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  product.ProductHistory:
+  internal_product.ProductHistory:
     properties:
       changed_at:
         type: string
@@ -92,7 +92,7 @@ definitions:
       stock:
         type: integer
     type: object
-  product.UpdateProductRequest:
+  internal_product.UpdateProductRequest:
     properties:
       category_ids:
         description: If provided, replaces existing categories
@@ -108,7 +108,41 @@ definitions:
       stock:
         type: integer
     type: object
-  web.PaginatedResponse:
+  qisur-service_internal_category.Category:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  qisur-service_internal_product.Product:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/qisur-service_internal_category.Category'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  qisur-service_pkg_web.PaginatedResponse:
     properties:
       items: {}
       page:
@@ -118,7 +152,7 @@ definitions:
       total_count:
         type: integer
     type: object
-  web.Response:
+  qisur-service_pkg_web.Response:
     properties:
       data: {}
       message:
@@ -126,7 +160,6 @@ definitions:
       status:
         type: string
     type: object
-host: localhost:8086
 info:
   contact:
     email: support@qisur.com.ar
@@ -148,7 +181,7 @@ paths:
         name: credentials
         required: true
         schema:
-          $ref: '#/definitions/auth.Login'
+          $ref: '#/definitions/internal_auth.Login'
       produces:
       - application/json
       responses:
@@ -179,12 +212,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/category.Category'
+              $ref: '#/definitions/internal_category.Category'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Get all categories
@@ -200,22 +233,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/category.CreateCategoryRequest'
+          $ref: '#/definitions/internal_category.CreateCategoryRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/category.Category'
+            $ref: '#/definitions/internal_category.Category'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Create category
@@ -236,15 +269,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Delete category
@@ -265,26 +298,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/category.UpdateCategoryRequest'
+          $ref: '#/definitions/internal_category.UpdateCategoryRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/category.Category'
+            $ref: '#/definitions/internal_category.Category'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Update category
@@ -310,15 +343,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.PaginatedResponse'
+            $ref: '#/definitions/qisur-service_pkg_web.PaginatedResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Get all products
@@ -334,22 +367,22 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/product.CreateProductRequest'
+          $ref: '#/definitions/internal_product.CreateProductRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/product.Product'
+            $ref: '#/definitions/internal_product.Product'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Create a product
@@ -372,15 +405,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Delete product
@@ -402,15 +435,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/product.Product'
+            $ref: '#/definitions/internal_product.Product'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Get product by ID
@@ -431,26 +464,26 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/product.UpdateProductRequest'
+          $ref: '#/definitions/internal_product.UpdateProductRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/product.Product'
+            $ref: '#/definitions/internal_product.Product'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Update product
@@ -482,12 +515,12 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/product.ProductHistory'
+              $ref: '#/definitions/internal_product.ProductHistory'
             type: array
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Get product history
@@ -511,16 +544,16 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/product.Product'
+              $ref: '#/definitions/qisur-service_internal_product.Product'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/web.Response'
+            $ref: '#/definitions/qisur-service_pkg_web.Response'
       security:
       - BearerAuth: []
       summary: Search products
