@@ -223,9 +223,7 @@ paths:
       - categories
   /api/categories/{id}:
     delete:
-      consumes:
-      - application/json
-      description: Delete a category by its ID. Admin role required.
+      description: Delete a category by ID. Admin role required.
       parameters:
       - description: Category ID
         in: path
@@ -255,7 +253,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update fields of an existing category. Admin role required.
+      description: Update an existing category by ID. Admin role required.
       parameters:
       - description: Category ID
         in: path
@@ -329,7 +327,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create a new product. Admin role required.
+      description: Create a new product
       parameters:
       - description: Product data
         in: body
@@ -354,14 +352,14 @@ paths:
             $ref: '#/definitions/web.Response'
       security:
       - BearerAuth: []
-      summary: Create product
+      summary: Create a product
       tags:
       - products
   /api/products/{id}:
     delete:
       consumes:
       - application/json
-      description: Delete a product by its ID. Admin role required.
+      description: Delete a product by ID. Admin role required.
       parameters:
       - description: Product ID
         in: path

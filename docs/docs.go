@@ -159,7 +159,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Update fields of an existing category. Admin role required.",
+                "description": "Update an existing category by ID. Admin role required.",
                 "consumes": [
                     "application/json"
                 ],
@@ -221,10 +221,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a category by its ID. Admin role required.",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Delete a category by ID. Admin role required.",
                 "produces": [
                     "application/json"
                 ],
@@ -322,7 +319,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Create a new product. Admin role required.",
+                "description": "Create a new product",
                 "consumes": [
                     "application/json"
                 ],
@@ -332,7 +329,7 @@ const docTemplate = `{
                 "tags": [
                     "products"
                 ],
-                "summary": "Create product",
+                "summary": "Create a product",
                 "parameters": [
                     {
                         "description": "Product data",
@@ -482,7 +479,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Delete a product by its ID. Admin role required.",
+                "description": "Delete a product by ID. Admin role required.",
                 "consumes": [
                     "application/json"
                 ],
