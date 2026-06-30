@@ -1,16 +1,12 @@
-FROM golang:alpine AS builder
-WORKDIR /app
-ENV GOWORK=off
-COPY go.mod go.sum* ./
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
-COPY ./ ./
-RUN --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=cache,target=/go/pkg/mod \
-    CGO_ENABLED=0 GOOS=linux GOMEMLIMIT=500MiB GOGC=20 go build -o qisur-tracker cmd/tracker/main.go
-
+# Pre-compiled lightweight image
 FROM alpine:3.19
 WORKDIR /app
-COPY --from=builder /app/qisur-tracker .
+
+# Copy the pre-compiled binary
+COPY deploy-bins/qisur-tracker .
+
+# Expose the default listening port
 EXPOSE 8087
+
+# Execute the microservice
 CMD ["./qisur-tracker"]
