@@ -1,0 +1,18 @@
+meta {
+  name: Create Category
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/qisur/api/categories
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Smartphones",
+    "description": "Mobile devices and accessories"
+  }
+}

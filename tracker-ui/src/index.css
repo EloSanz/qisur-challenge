@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#000000] text-gray-100 font-sans antialiased selection:bg-blue-500/30;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] shadow-2xl;
+  }
+  .glass-card {
+    @apply bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.05] hover:border-white/[0.1] transition-all duration-300;
+  }
+  .neon-text {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* React Flow Dark Theme Overrides */
+.react-flow__panel {
+  @apply !bg-black/50 !backdrop-blur-md border !border-white/10 !rounded-xl;
+}
+.react-flow__controls-button {
+  @apply !bg-transparent border-b !border-white/10 !text-gray-300 hover:!bg-white/10;
+}
+.react-flow__minimap {
+  @apply !bg-black/80 !border-white/10;
+}
+.react-flow__minimap-mask {
+  @apply !fill-black/60;
+}

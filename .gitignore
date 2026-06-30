@@ -1,0 +1,9 @@
+vendor/
+tracker-ui/node_modules/
+tracker-ui/dist/
+.git/
+.idea/
+.vscode/
+qisur-api
+qisur-tracker
+postgres_data/

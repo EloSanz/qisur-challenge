@@ -1,0 +1,142 @@
+name: qisur-challenge
+
+services:
+  # API Gateway
+  api-gateway:
+    image: nginx:alpine
+    container_name: qisur-gateway
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - qisur-service
+      - tracker-ui
+      - qisur-tracker
+
+  # PostgreSQL Database
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: qisur-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=qisur_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d qisur_db" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: qisur-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Qisur Service (Go)
+  qisur-service:
+    image: golang:alpine
+    working_dir: /app
+    command: sh -c "go run cmd/api/main.go"
+    volumes:
+      - ./:/app
+    container_name: qisur-api
+    environment:
+      - DB_HOST=postgres-db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=qisur_db
+      - DB_PORT=5432
+      - DB_SSLMODE=disable
+      - PORT=8086
+      - JWT_SECRET=supersecretqisurkey
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672/
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  # Tracker Backend Service (Go)
+  qisur-tracker:
+    image: golang:alpine
+    working_dir: /app
+    command: sh -c "go run cmd/tracker/main.go"
+    volumes:
+      - ./:/app
+    container_name: qisur-tracker
+    environment:
+      - DB_HOST=postgres-db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=qisur_db
+      - DB_PORT=5432
+      - DB_SSLMODE=disable
+      - PORT=8087
+      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672/
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # Tracker UI (React)
+  tracker-ui:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./tracker-ui:/app
+      - /app/node_modules
+    container_name: tracker-ui
+
+  # Log Database (Loki)
+  loki:
+    image: grafana/loki:latest
+    container_name: qisur-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  # Log Collector (Promtail)
+  promtail:
+    image: grafana/promtail:latest
+    container_name: qisur-promtail
+    volumes:
+      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+
+  # Metrics & Logs Viewer (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: qisur-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./monitoring/dashboard-provider.yaml:/etc/grafana/provisioning/dashboards/dashboard-provider.yaml:ro
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - loki
+
+volumes:
+  postgres_data:

@@ -1,0 +1,20 @@
+meta {
+  name: Create Product
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/qisur/api/products
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "iPhone 15 Pro",
+    "price": 1200.00,
+    "stock": 50,
+    "categoryIds": []
+  }
+}
