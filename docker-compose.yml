@@ -50,11 +50,9 @@ services:
 
   # Qisur Service (Go)
   qisur-service:
-    image: golang:alpine
-    working_dir: /app
-    command: sh -c "go build -o bin/qisur-api cmd/api/main.go && ./bin/qisur-api"
-    volumes:
-      - ./:/app
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: qisur-api
     environment:
       - DB_HOST=postgres-db
@@ -72,11 +70,9 @@ services:
 
   # Tracker Backend Service (Go)
   qisur-tracker:
-    image: golang:alpine
-    working_dir: /app
-    command: sh -c "go build -o bin/qisur-tracker cmd/tracker/main.go && ./bin/qisur-tracker"
-    volumes:
-      - ./:/app
+    build:
+      context: .
+      dockerfile: Dockerfile.tracker
     container_name: qisur-tracker
     environment:
       - DB_HOST=postgres-db

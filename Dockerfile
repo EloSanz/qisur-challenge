@@ -15,7 +15,7 @@ RUN go mod download
 COPY ./ ./
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -p 1 -o qisur-api cmd/api/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOMEMLIMIT=500MiB GOGC=20 go build -p 1 -o qisur-api cmd/api/main.go
 
 # Super lightweight final stage
 FROM alpine:3.19
