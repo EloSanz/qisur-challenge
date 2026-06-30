@@ -1,6 +1,7 @@
 package product
 
 import (
+	"context"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,12 +11,12 @@ import (
 )
 
 type Service interface {
-	GetAll(page, pageSize int) ([]Product, int64, error)
-	GetByID(id string) (*Product, error)
-	Create(traceID string, prod *Product, categoryIDs []string) (*Product, error)
-	Update(traceID string, id string, req UpdateProductRequest) (*Product, error)
-	Delete(traceID string, id string) error
-	GetHistory(productID string, start, end time.Time) ([]ProductHistory, error)
+	GetAll(ctx context.Context, page, pageSize int) ([]Product, int64, error)
+	GetByID(ctx context.Context, id string) (*Product, error)
+	Create(ctx context.Context, traceID string, prod *Product, categoryIDs []string) (*Product, error)
+	Update(ctx context.Context, traceID string, id string, req UpdateProductRequest) (*Product, error)
+	Delete(ctx context.Context, traceID string, id string) error
+	GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error)
 }
 
 type service struct {
@@ -32,20 +33,20 @@ func NewService(repo Repository, hub *websocket.Hub, rmq *rabbitmq.Client) Servi
 	}
 }
 
-func (s *service) GetAll(page, pageSize int) ([]Product, int64, error) {
-	return s.repo.FindAll(page, pageSize)
+func (s *service) GetAll(ctx context.Context, page, pageSize int) ([]Product, int64, error) {
+	return s.repo.FindAll(ctx, page, pageSize)
 }
 
-func (s *service) GetByID(id string) (*Product, error) {
-	return s.repo.FindByID(id)
+func (s *service) GetByID(ctx context.Context, id string) (*Product, error) {
+	return s.repo.FindByID(ctx, id)
 }
 
-func (s *service) Create(traceID string, prod *Product, categoryIDs []string) (*Product, error) {
-	if err := s.repo.Create(prod, categoryIDs); err != nil {
+func (s *service) Create(ctx context.Context, traceID string, prod *Product, categoryIDs []string) (*Product, error) {
+	if err := s.repo.Create(ctx, prod, categoryIDs); err != nil {
 		return nil, err
 	}
 
-	createdProd, _ := s.repo.FindByID(prod.ID)
+	createdProd, _ := s.repo.FindByID(ctx, prod.ID)
 	
 	audit.Emit(s.rmq, traceID, "DB_SAVED", "product", prod.ID)
 
@@ -56,8 +57,8 @@ func (s *service) Create(traceID string, prod *Product, categoryIDs []string) (*
 	return createdProd, nil
 }
 
-func (s *service) Update(traceID string, id string, req UpdateProductRequest) (*Product, error) {
-	prod, err := s.repo.FindByID(id)
+func (s *service) Update(ctx context.Context, traceID string, id string, req UpdateProductRequest) (*Product, error) {
+	prod, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +76,11 @@ func (s *service) Update(traceID string, id string, req UpdateProductRequest) (*
 		prod.Stock = req.Stock
 	}
 
-	if err := s.repo.Update(prod, req.CategoryIDs); err != nil {
+	if err := s.repo.Update(ctx, prod, req.CategoryIDs); err != nil {
 		return nil, err
 	}
 
-	updatedProd, _ := s.repo.FindByID(prod.ID)
+	updatedProd, _ := s.repo.FindByID(ctx, prod.ID)
 	
 	audit.Emit(s.rmq, traceID, "DB_SAVED", "product", prod.ID)
 
@@ -90,8 +91,8 @@ func (s *service) Update(traceID string, id string, req UpdateProductRequest) (*
 	return updatedProd, nil
 }
 
-func (s *service) Delete(traceID string, id string) error {
-	if err := s.repo.Delete(id); err != nil {
+func (s *service) Delete(ctx context.Context, traceID string, id string) error {
+	if err := s.repo.Delete(ctx, id); err != nil {
 		return err
 	}
 
@@ -104,6 +105,6 @@ func (s *service) Delete(traceID string, id string) error {
 	return nil
 }
 
-func (s *service) GetHistory(productID string, start, end time.Time) ([]ProductHistory, error) {
-	return s.repo.GetHistory(productID, start, end)
+func (s *service) GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error) {
+	return s.repo.GetHistory(ctx, productID, start, end)
 }

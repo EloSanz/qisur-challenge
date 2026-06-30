@@ -1,6 +1,7 @@
 package product
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -14,12 +15,12 @@ var (
 )
 
 type Repository interface {
-	FindAll(page, pageSize int) ([]Product, int64, error)
-	FindByID(id string) (*Product, error)
-	Create(prod *Product, categoryIDs []string) error
-	Update(prod *Product, categoryIDs []string) error
-	Delete(id string) error
-	GetHistory(productID string, start, end time.Time) ([]ProductHistory, error)
+	FindAll(ctx context.Context, page, pageSize int) ([]Product, int64, error)
+	FindByID(ctx context.Context, id string) (*Product, error)
+	Create(ctx context.Context, prod *Product, categoryIDs []string) error
+	Update(ctx context.Context, prod *Product, categoryIDs []string) error
+	Delete(ctx context.Context, id string) error
+	GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error)
 }
 
 type repository struct {
@@ -30,24 +31,24 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repository{db: db}
 }
 
-func (r *repository) FindAll(page, pageSize int) ([]Product, int64, error) {
+func (r *repository) FindAll(ctx context.Context, page, pageSize int) ([]Product, int64, error) {
 	var products []Product
 	var total int64
 
 	offset := (page - 1) * pageSize
 
-	err := r.db.Model(&Product{}).Count(&total).Error
+	err := r.db.WithContext(ctx).Model(&Product{}).Count(&total).Error
 	if err != nil {
 		return nil, 0, err
 	}
 
-	err = r.db.Preload("Categories").Limit(pageSize).Offset(offset).Find(&products).Error
+	err = r.db.WithContext(ctx).Preload("Categories").Limit(pageSize).Offset(offset).Find(&products).Error
 	return products, total, err
 }
 
-func (r *repository) FindByID(id string) (*Product, error) {
+func (r *repository) FindByID(ctx context.Context, id string) (*Product, error) {
 	var prod Product
-	err := r.db.Preload("Categories").First(&prod, "id = ?", id).Error
+	err := r.db.WithContext(ctx).Preload("Categories").First(&prod, "id = ?", id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrProductNotFound
@@ -57,8 +58,8 @@ func (r *repository) FindByID(id string) (*Product, error) {
 	return &prod, nil
 }
 
-func (r *repository) Create(prod *Product, categoryIDs []string) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
+func (r *repository) Create(ctx context.Context, prod *Product, categoryIDs []string) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 
 		if err := tx.Create(prod).Error; err != nil {
 			return err
@@ -85,8 +86,8 @@ func (r *repository) Create(prod *Product, categoryIDs []string) error {
 	})
 }
 
-func (r *repository) Update(prod *Product, categoryIDs []string) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
+func (r *repository) Update(ctx context.Context, prod *Product, categoryIDs []string) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 
 		var oldProd Product
 		if err := tx.First(&oldProd, "id = ?", prod.ID).Error; err != nil {
@@ -130,8 +131,8 @@ func (r *repository) Update(prod *Product, categoryIDs []string) error {
 	})
 }
 
-func (r *repository) Delete(id string) error {
-	result := r.db.Delete(&Product{}, "id = ?", id)
+func (r *repository) Delete(ctx context.Context, id string) error {
+	result := r.db.WithContext(ctx).Delete(&Product{}, "id = ?", id)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -141,9 +142,9 @@ func (r *repository) Delete(id string) error {
 	return nil
 }
 
-func (r *repository) GetHistory(productID string, start, end time.Time) ([]ProductHistory, error) {
+func (r *repository) GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error) {
 	var history []ProductHistory
-	query := r.db.Where("product_id = ?", productID)
+	query := r.db.WithContext(ctx).Where("product_id = ?", productID)
 
 	if !start.IsZero() {
 		query = query.Where("changed_at >= ?", start)

@@ -31,12 +31,27 @@ func NewHandler(svc Service) *Handler {
 // @Failure 500 {object} web.Response
 // @Router /api/categories [get]
 func (h *Handler) GetAll(c *gin.Context) {
-	categories, err := h.svc.GetAll()
+	categories, err := h.svc.GetAll(c.Request.Context())
 	if err != nil {
 		web.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	web.JSON(c, http.StatusOK, categories, "Categories retrieved")
+}
+
+// GetByID retrieves a single category by ID
+func (h *Handler) GetByID(c *gin.Context) {
+	id := c.Param("id")
+	cat, err := h.svc.GetByID(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, ErrCategoryNotFound) {
+			web.Error(c, http.StatusNotFound, "Category not found")
+			return
+		}
+		web.Error(c, http.StatusInternalServerError, "Failed to retrieve category")
+		return
+	}
+	web.JSON(c, http.StatusOK, cat, "Category retrieved")
 }
 
 // Create adds a new category
@@ -64,7 +79,7 @@ func (h *Handler) Create(c *gin.Context) {
 		Description: req.Description,
 	}
 
-	createdCat, err := h.svc.Create(traceID, cat)
+	createdCat, err := h.svc.Create(c.Request.Context(), traceID, cat)
 	if err != nil {
 		web.Error(c, http.StatusInternalServerError, "Failed to create category")
 		return
@@ -97,7 +112,7 @@ func (h *Handler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedCat, err := h.svc.Update(traceID, id, req)
+	updatedCat, err := h.svc.Update(c.Request.Context(), traceID, id, req)
 	if err != nil {
 		if errors.Is(err, ErrCategoryNotFound) {
 			web.Error(c, http.StatusNotFound, "Category not found")
@@ -125,7 +140,7 @@ func (h *Handler) Delete(c *gin.Context) {
 	traceID := uuid.New().String()
 	id := c.Param("id")
 
-	if err := h.svc.Delete(traceID, id); err != nil {
+	if err := h.svc.Delete(c.Request.Context(), traceID, id); err != nil {
 		if errors.Is(err, ErrCategoryNotFound) {
 			web.Error(c, http.StatusNotFound, "Category not found")
 			return

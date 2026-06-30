@@ -46,7 +46,7 @@ func (h *Handler) Search(c *gin.Context) {
 
 	if searchType == "category" {
 		var categories []category.Category
-		if err := h.db.Where("name ILIKE ? OR description ILIKE ?", searchPattern, searchPattern).Find(&categories).Error; err != nil {
+		if err := h.db.WithContext(c.Request.Context()).Where("name ILIKE ? OR description ILIKE ?", searchPattern, searchPattern).Find(&categories).Error; err != nil {
 			web.Error(c, http.StatusInternalServerError, "Failed to search categories")
 			return
 		}
@@ -56,7 +56,7 @@ func (h *Handler) Search(c *gin.Context) {
 
 	// Default to product search
 	var products []product.Product
-	if err := h.db.Preload("Categories").Where("name ILIKE ? OR description ILIKE ?", searchPattern, searchPattern).Find(&products).Error; err != nil {
+	if err := h.db.WithContext(c.Request.Context()).Preload("Categories").Where("name ILIKE ? OR description ILIKE ?", searchPattern, searchPattern).Find(&products).Error; err != nil {
 		web.Error(c, http.StatusInternalServerError, "Failed to search products")
 		return
 	}

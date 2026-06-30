@@ -48,28 +48,31 @@ func InitRouter(
 	})
 
 
+	publicProducts := apiGroup.Group("/products")
+	{
+		publicProducts.GET("", productHandler.GetAll)
+		publicProducts.GET("/:id", productHandler.GetByID)
+		publicProducts.GET("/:id/history", productHandler.GetHistory)
+	}
+
+	publicCategories := apiGroup.Group("/categories")
+	{
+		publicCategories.GET("", categoryHandler.GetAll)
+		publicCategories.GET("/:id", categoryHandler.GetByID)
+	}
+
 	protected := r.Group("/api")
 	protected.Use(authMiddleware.MiddlewareFunc())
 	{
-
 		products := protected.Group("/products")
 		{
-			products.GET("", productHandler.GetAll)
-			products.GET("/:id", productHandler.GetByID)
-			products.GET("/:id/history", productHandler.GetHistory)
-
-
 			products.POST("", auth.RequireRole("admin"), productHandler.Create)
 			products.PUT("/:id", auth.RequireRole("admin"), productHandler.Update)
 			products.DELETE("/:id", auth.RequireRole("admin"), productHandler.Delete)
 		}
 
-
 		categories := protected.Group("/categories")
 		{
-			categories.GET("", categoryHandler.GetAll)
-
-
 			categories.POST("", auth.RequireRole("admin"), categoryHandler.Create)
 			categories.PUT("/:id", auth.RequireRole("admin"), categoryHandler.Update)
 			categories.DELETE("/:id", auth.RequireRole("admin"), categoryHandler.Delete)

@@ -1,6 +1,7 @@
 package category
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"qisur-service/internal/websocket"
 	"qisur-service/pkg/audit"
@@ -8,10 +9,11 @@ import (
 )
 
 type Service interface {
-	GetAll() ([]Category, error)
-	Create(traceID string, cat *Category) (*Category, error)
-	Update(traceID string, id string, req UpdateCategoryRequest) (*Category, error)
-	Delete(traceID string, id string) error
+	GetAll(ctx context.Context) ([]Category, error)
+	GetByID(ctx context.Context, id string) (*Category, error)
+	Create(ctx context.Context, traceID string, cat *Category) (*Category, error)
+	Update(ctx context.Context, traceID string, id string, req UpdateCategoryRequest) (*Category, error)
+	Delete(ctx context.Context, traceID string, id string) error
 }
 
 type service struct {
@@ -28,12 +30,16 @@ func NewService(repo Repository, hub *websocket.Hub, rmq *rabbitmq.Client) Servi
 	}
 }
 
-func (s *service) GetAll() ([]Category, error) {
-	return s.repo.FindAll()
+func (s *service) GetAll(ctx context.Context) ([]Category, error) {
+	return s.repo.FindAll(ctx)
 }
 
-func (s *service) Create(traceID string, cat *Category) (*Category, error) {
-	if err := s.repo.Create(cat); err != nil {
+func (s *service) GetByID(ctx context.Context, id string) (*Category, error) {
+	return s.repo.FindByID(ctx, id)
+}
+
+func (s *service) Create(ctx context.Context, traceID string, cat *Category) (*Category, error) {
+	if err := s.repo.Create(ctx, cat); err != nil {
 		return nil, err
 	}
 
@@ -45,8 +51,8 @@ func (s *service) Create(traceID string, cat *Category) (*Category, error) {
 	return cat, nil
 }
 
-func (s *service) Update(traceID string, id string, req UpdateCategoryRequest) (*Category, error) {
-	cat, err := s.repo.FindByID(id)
+func (s *service) Update(ctx context.Context, traceID string, id string, req UpdateCategoryRequest) (*Category, error) {
+	cat, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +64,7 @@ func (s *service) Update(traceID string, id string, req UpdateCategoryRequest) (
 		cat.Description = req.Description
 	}
 
-	if err := s.repo.Update(cat); err != nil {
+	if err := s.repo.Update(ctx, cat); err != nil {
 		return nil, err
 	}
 
@@ -70,8 +76,8 @@ func (s *service) Update(traceID string, id string, req UpdateCategoryRequest) (
 	return cat, nil
 }
 
-func (s *service) Delete(traceID string, id string) error {
-	if err := s.repo.Delete(id); err != nil {
+func (s *service) Delete(ctx context.Context, traceID string, id string) error {
+	if err := s.repo.Delete(ctx, id); err != nil {
 		return err
 	}
 

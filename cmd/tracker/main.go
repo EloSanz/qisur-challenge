@@ -22,7 +22,7 @@ type AuditTrace struct {
 	TraceID    string    `json:"trace_id"`
 	Action     string    `json:"action"`
 	EntityType string    `json:"entity_type"`
-	EntityID   string    `json:"entity_id"`
+	EntityID   *string   `json:"entity_id"`
 	Timestamp  time.Time `json:"timestamp"`
 }
 
@@ -54,14 +54,22 @@ func main() {
 		slog.Error("Failed to connect to RabbitMQ", "error", err)
 		os.Exit(1)
 	}
-	defer conn.Close()
+	defer func() {
+		if closeErr := conn.Close(); closeErr != nil {
+			slog.Error("Failed to close RabbitMQ connection", "error", closeErr)
+		}
+	}()
 
 	ch, err := conn.Channel()
 	if err != nil {
 		slog.Error("Failed to open a channel", "error", err)
 		os.Exit(1)
 	}
-	defer ch.Close()
+	defer func() {
+		if closeErr := ch.Close(); closeErr != nil {
+			slog.Error("Failed to close RabbitMQ channel", "error", closeErr)
+		}
+	}()
 
 	// Ensure exchange exists
 	err = ch.ExchangeDeclare(
@@ -118,11 +126,15 @@ func main() {
 		for d := range msgs {
 			var msg audit.AuditMessage
 			if err := json.Unmarshal(d.Body, &msg); err == nil {
+				var entityIDPtr *string
+				if msg.EntityID != "" {
+					entityIDPtr = &msg.EntityID
+				}
 				trace := AuditTrace{
 					TraceID:    msg.TraceID,
 					Action:     msg.Action,
 					EntityType: msg.EntityType,
-					EntityID:   msg.EntityID,
+					EntityID:   entityIDPtr,
 					Timestamp:  msg.Timestamp,
 				}
 				db.Create(&trace)
@@ -164,5 +176,7 @@ func main() {
 		port = "8087"
 	}
 	slog.Info("Tracker running on port " + port)
-	r.Run(":" + port)
+	if err := r.Run(":" + port); err != nil {
+		slog.Error("Server failed", "error", err)
+	}
 }

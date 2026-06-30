@@ -2,6 +2,7 @@ package product
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -13,53 +14,53 @@ import (
 
 // MockService is a manual mock for the Service interface
 type MockService struct {
-	GetAllFunc     func(page, pageSize int) ([]Product, int64, error)
-	GetByIDFunc    func(id string) (*Product, error)
-	CreateFunc     func(traceID string, prod *Product, categoryIDs []string) (*Product, error)
-	UpdateFunc     func(traceID string, id string, req UpdateProductRequest) (*Product, error)
-	DeleteFunc     func(traceID string, id string) error
-	GetHistoryFunc func(productID string, start, end time.Time) ([]ProductHistory, error)
+	GetAllFunc     func(ctx context.Context, page, pageSize int) ([]Product, int64, error)
+	GetByIDFunc    func(ctx context.Context, id string) (*Product, error)
+	CreateFunc     func(ctx context.Context, traceID string, prod *Product, categoryIDs []string) (*Product, error)
+	UpdateFunc     func(ctx context.Context, traceID string, id string, req UpdateProductRequest) (*Product, error)
+	DeleteFunc     func(ctx context.Context, traceID string, id string) error
+	GetHistoryFunc func(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error)
 }
 
-func (m *MockService) GetAll(page, pageSize int) ([]Product, int64, error) {
+func (m *MockService) GetAll(ctx context.Context, page, pageSize int) ([]Product, int64, error) {
 	if m.GetAllFunc != nil {
-		return m.GetAllFunc(page, pageSize)
+		return m.GetAllFunc(ctx, page, pageSize)
 	}
 	return nil, 0, nil
 }
 
-func (m *MockService) GetByID(id string) (*Product, error) {
+func (m *MockService) GetByID(ctx context.Context, id string) (*Product, error) {
 	if m.GetByIDFunc != nil {
-		return m.GetByIDFunc(id)
+		return m.GetByIDFunc(ctx, id)
 	}
 	return nil, ErrProductNotFound
 }
 
-func (m *MockService) Create(traceID string, prod *Product, categoryIDs []string) (*Product, error) {
+func (m *MockService) Create(ctx context.Context, traceID string, prod *Product, categoryIDs []string) (*Product, error) {
 	if m.CreateFunc != nil {
-		return m.CreateFunc(traceID, prod, categoryIDs)
+		return m.CreateFunc(ctx, traceID, prod, categoryIDs)
 	}
 	prod.ID = "mock-id-123"
 	return prod, nil
 }
 
-func (m *MockService) Update(traceID string, id string, req UpdateProductRequest) (*Product, error) {
+func (m *MockService) Update(ctx context.Context, traceID string, id string, req UpdateProductRequest) (*Product, error) {
 	if m.UpdateFunc != nil {
-		return m.UpdateFunc(traceID, id, req)
+		return m.UpdateFunc(ctx, traceID, id, req)
 	}
 	return &Product{ID: id}, nil
 }
 
-func (m *MockService) Delete(traceID string, id string) error {
+func (m *MockService) Delete(ctx context.Context, traceID string, id string) error {
 	if m.DeleteFunc != nil {
-		return m.DeleteFunc(traceID, id)
+		return m.DeleteFunc(ctx, traceID, id)
 	}
 	return nil
 }
 
-func (m *MockService) GetHistory(productID string, start, end time.Time) ([]ProductHistory, error) {
+func (m *MockService) GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error) {
 	if m.GetHistoryFunc != nil {
-		return m.GetHistoryFunc(productID, start, end)
+		return m.GetHistoryFunc(ctx, productID, start, end)
 	}
 	return nil, nil
 }
@@ -73,7 +74,7 @@ func setupTestRouter(svc Service) (*gin.Engine, *Handler) {
 
 func TestHandler_GetByID(t *testing.T) {
 	mockSvc := &MockService{
-		GetByIDFunc: func(id string) (*Product, error) {
+		GetByIDFunc: func(ctx context.Context, id string) (*Product, error) {
 			if id == "123" {
 				return &Product{ID: "123", Name: "Mocked Product"}, nil
 			}

@@ -53,7 +53,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 		query.PageSize = 10
 	}
 
-	products, total, err := h.svc.GetAll(query.Page, query.PageSize)
+	products, total, err := h.svc.GetAll(c.Request.Context(), query.Page, query.PageSize)
 	if err != nil {
 		web.Error(c, http.StatusInternalServerError, err.Error())
 		return
@@ -81,7 +81,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 // @Router /api/products/{id} [get]
 func (h *Handler) GetByID(c *gin.Context) {
 	id := c.Param("id")
-	prod, err := h.svc.GetByID(id)
+	prod, err := h.svc.GetByID(c.Request.Context(), id)
 	if err != nil {
 		if errors.Is(err, ErrProductNotFound) {
 			web.Error(c, http.StatusNotFound, "Product not found")
@@ -124,7 +124,7 @@ func (h *Handler) Create(c *gin.Context) {
 		Stock:       req.Stock,
 	}
 
-	createdProd, err := h.svc.Create(traceID, prod, req.CategoryIDs)
+	createdProd, err := h.svc.Create(c.Request.Context(), traceID, prod, req.CategoryIDs)
 	if err != nil {
 		web.Error(c, http.StatusInternalServerError, "Failed to create product")
 		return
@@ -157,7 +157,7 @@ func (h *Handler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedProd, err := h.svc.Update(traceID, id, req)
+	updatedProd, err := h.svc.Update(c.Request.Context(), traceID, id, req)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			web.Error(c, http.StatusNotFound, "Product not found")
@@ -186,7 +186,7 @@ func (h *Handler) Delete(c *gin.Context) {
 	traceID := uuid.New().String()
 	id := c.Param("id")
 
-	if err := h.svc.Delete(traceID, id); err != nil {
+	if err := h.svc.Delete(c.Request.Context(), traceID, id); err != nil {
 		if errors.Is(err, ErrProductNotFound) {
 			web.Error(c, http.StatusNotFound, "Product not found")
 			return
@@ -224,7 +224,7 @@ func (h *Handler) GetHistory(c *gin.Context) {
 		end, _ = time.Parse(time.RFC3339, endStr)
 	}
 
-	history, err := h.svc.GetHistory(id, start, end)
+	history, err := h.svc.GetHistory(c.Request.Context(), id, start, end)
 	if err != nil {
 		web.Error(c, http.StatusInternalServerError, "Failed to retrieve history")
 		return

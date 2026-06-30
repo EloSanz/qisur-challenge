@@ -21,7 +21,7 @@ func Connect(url string) (*Client, error) {
 
 	ch, err := conn.Channel()
 	if err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 
@@ -36,8 +36,8 @@ func Connect(url string) (*Client, error) {
 		nil,          // arguments
 	)
 	if err != nil {
-		ch.Close()
-		conn.Close()
+		_ = ch.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 
@@ -51,9 +51,13 @@ func Connect(url string) (*Client, error) {
 
 func (c *Client) Close() {
 	if c.Channel != nil {
-		c.Channel.Close()
+		if err := c.Channel.Close(); err != nil {
+			slog.Error("Failed to close RabbitMQ channel", "error", err)
+		}
 	}
 	if c.Conn != nil {
-		c.Conn.Close()
+		if err := c.Conn.Close(); err != nil {
+			slog.Error("Failed to close RabbitMQ connection", "error", err)
+		}
 	}
 }

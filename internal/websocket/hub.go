@@ -119,7 +119,10 @@ func (h *Hub) ListenRabbitMQ() {
 	for d := range msgs {
 		slog.Info("Received message from RabbitMQ", "body_size", len(d.Body))
 		var evt WSEvent
-		json.Unmarshal(d.Body, &evt)
+		if err := json.Unmarshal(d.Body, &evt); err != nil {
+			slog.Error("Failed to unmarshal WS event", "error", err)
+			continue
+		}
 		if evt.TraceID != "" {
 			audit.Emit(h.rmq, evt.TraceID, "CONSUMED_BY_HUB", evt.Event, "")
 		}

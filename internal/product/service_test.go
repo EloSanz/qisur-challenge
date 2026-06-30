@@ -1,6 +1,7 @@
 package product
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -8,61 +9,61 @@ import (
 
 // MockRepository is a simple manual mock for the Repository interface
 type MockRepository struct {
-	FindAllFunc    func(page, pageSize int) ([]Product, int64, error)
-	FindByIDFunc   func(id string) (*Product, error)
-	CreateFunc     func(prod *Product, categoryIDs []string) error
-	UpdateFunc     func(prod *Product, categoryIDs []string) error
-	DeleteFunc     func(id string) error
-	GetHistoryFunc func(productID string, start, end time.Time) ([]ProductHistory, error)
+	FindAllFunc    func(ctx context.Context, page, pageSize int) ([]Product, int64, error)
+	FindByIDFunc   func(ctx context.Context, id string) (*Product, error)
+	CreateFunc     func(ctx context.Context, prod *Product, categoryIDs []string) error
+	UpdateFunc     func(ctx context.Context, prod *Product, categoryIDs []string) error
+	DeleteFunc     func(ctx context.Context, id string) error
+	GetHistoryFunc func(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error)
 }
 
-func (m *MockRepository) FindAll(page, pageSize int) ([]Product, int64, error) {
+func (m *MockRepository) FindAll(ctx context.Context, page, pageSize int) ([]Product, int64, error) {
 	if m.FindAllFunc != nil {
-		return m.FindAllFunc(page, pageSize)
+		return m.FindAllFunc(ctx, page, pageSize)
 	}
 	return nil, 0, nil
 }
 
-func (m *MockRepository) FindByID(id string) (*Product, error) {
+func (m *MockRepository) FindByID(ctx context.Context, id string) (*Product, error) {
 	if m.FindByIDFunc != nil {
-		return m.FindByIDFunc(id)
+		return m.FindByIDFunc(ctx, id)
 	}
 	return nil, ErrProductNotFound
 }
 
-func (m *MockRepository) Create(prod *Product, categoryIDs []string) error {
+func (m *MockRepository) Create(ctx context.Context, prod *Product, categoryIDs []string) error {
 	if m.CreateFunc != nil {
-		return m.CreateFunc(prod, categoryIDs)
+		return m.CreateFunc(ctx, prod, categoryIDs)
 	}
 	// Simulate ID generation
 	prod.ID = "mock-id-123"
 	return nil
 }
 
-func (m *MockRepository) Update(prod *Product, categoryIDs []string) error {
+func (m *MockRepository) Update(ctx context.Context, prod *Product, categoryIDs []string) error {
 	if m.UpdateFunc != nil {
-		return m.UpdateFunc(prod, categoryIDs)
+		return m.UpdateFunc(ctx, prod, categoryIDs)
 	}
 	return nil
 }
 
-func (m *MockRepository) Delete(id string) error {
+func (m *MockRepository) Delete(ctx context.Context, id string) error {
 	if m.DeleteFunc != nil {
-		return m.DeleteFunc(id)
+		return m.DeleteFunc(ctx, id)
 	}
 	return nil
 }
 
-func (m *MockRepository) GetHistory(productID string, start, end time.Time) ([]ProductHistory, error) {
+func (m *MockRepository) GetHistory(ctx context.Context, productID string, start, end time.Time) ([]ProductHistory, error) {
 	if m.GetHistoryFunc != nil {
-		return m.GetHistoryFunc(productID, start, end)
+		return m.GetHistoryFunc(ctx, productID, start, end)
 	}
 	return nil, nil
 }
 
 func TestService_GetByID(t *testing.T) {
 	mockRepo := &MockRepository{
-		FindByIDFunc: func(id string) (*Product, error) {
+		FindByIDFunc: func(ctx context.Context, id string) (*Product, error) {
 			if id == "found" {
 				return &Product{ID: "found", Name: "Test Product"}, nil
 			}
@@ -73,7 +74,7 @@ func TestService_GetByID(t *testing.T) {
 	svc := NewService(mockRepo, nil, nil) // no hub needed for simple get
 
 	t.Run("Found", func(t *testing.T) {
-		prod, err := svc.GetByID("found")
+		prod, err := svc.GetByID(context.Background(), "found")
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
@@ -83,7 +84,7 @@ func TestService_GetByID(t *testing.T) {
 	})
 
 	t.Run("Not Found", func(t *testing.T) {
-		prod, err := svc.GetByID("not-found")
+		prod, err := svc.GetByID(context.Background(), "not-found")
 		if !errors.Is(err, ErrProductNotFound) {
 			t.Errorf("expected ErrProductNotFound, got %v", err)
 		}
@@ -95,14 +96,14 @@ func TestService_GetByID(t *testing.T) {
 
 func TestService_Create(t *testing.T) {
 	mockRepo := &MockRepository{
-		CreateFunc: func(prod *Product, categoryIDs []string) error {
+		CreateFunc: func(ctx context.Context, prod *Product, categoryIDs []string) error {
 			if prod.Name == "Error Product" {
 				return errors.New("db error")
 			}
 			prod.ID = "new-id"
 			return nil
 		},
-		FindByIDFunc: func(id string) (*Product, error) {
+		FindByIDFunc: func(ctx context.Context, id string) (*Product, error) {
 			return &Product{ID: "new-id", Name: "New Product"}, nil
 		},
 	}
@@ -111,7 +112,7 @@ func TestService_Create(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		prod := &Product{Name: "New Product"}
-		created, err := svc.Create("test-trace", prod, nil)
+		created, err := svc.Create(context.Background(), "test-trace", prod, nil)
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
@@ -122,7 +123,7 @@ func TestService_Create(t *testing.T) {
 
 	t.Run("Error", func(t *testing.T) {
 		prod := &Product{Name: "Error Product"}
-		created, err := svc.Create("test-trace", prod, nil)
+		created, err := svc.Create(context.Background(), "test-trace", prod, nil)
 		if err == nil {
 			t.Errorf("expected error, got nil")
 		}

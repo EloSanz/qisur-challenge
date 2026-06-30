@@ -53,7 +53,7 @@ services:
   qisur-service:
     image: golang:alpine
     working_dir: /app
-    command: sh -c "go run cmd/api/main.go"
+    command: sh -c "./bin/qisur-api"
     volumes:
       - ./:/app
     container_name: qisur-api
@@ -75,7 +75,7 @@ services:
   qisur-tracker:
     image: golang:alpine
     working_dir: /app
-    command: sh -c "go run cmd/tracker/main.go"
+    command: sh -c "./bin/qisur-tracker"
     volumes:
       - ./:/app
     container_name: qisur-tracker
@@ -131,6 +131,8 @@ services:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=http://localhost:8080/qisur/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
       - ./monitoring/dashboard-provider.yaml:/etc/grafana/provisioning/dashboards/dashboard-provider.yaml:ro
