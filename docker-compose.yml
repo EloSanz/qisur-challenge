@@ -3,6 +3,7 @@ name: qisur-challenge
 services:
   # API Gateway
   api-gateway:
+    restart: unless-stopped
     image: nginx:alpine
     container_name: qisur-gateway
     ports:
@@ -50,6 +51,7 @@ services:
 
   # Qisur Service (Go)
   qisur-service:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -70,6 +72,7 @@ services:
 
   # Tracker Backend Service (Go)
   qisur-tracker:
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile.tracker

@@ -49,9 +49,17 @@ func main() {
 	if rmqURL == "" {
 		rmqURL = "amqp://user:password@localhost:5673/"
 	}
-	conn, err := amqp.Dial(rmqURL)
+	var conn *amqp.Connection
+	for i := 0; i < 15; i++ {
+		conn, err = amqp.Dial(rmqURL)
+		if err == nil {
+			break
+		}
+		slog.Warn("Failed to connect to RabbitMQ, retrying in 3 seconds...", "error", err)
+		time.Sleep(3 * time.Second)
+	}
 	if err != nil {
-		slog.Error("Failed to connect to RabbitMQ", "error", err)
+		slog.Error("Failed to connect to RabbitMQ after retries", "error", err)
 		os.Exit(1)
 	}
 	defer func() {
