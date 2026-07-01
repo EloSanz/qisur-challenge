@@ -36,9 +36,7 @@ type Client struct {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		if err := c.conn.Close(); err != nil {
-			slog.Error("Failed to close websocket connection", "error", err)
-		}
+		c.conn.Close()
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -58,9 +56,7 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		if err := c.conn.Close(); err != nil {
-			slog.Error("Failed to close websocket connection", "error", err)
-		}
+		c.conn.Close()
 	}()
 	for {
 		select {
